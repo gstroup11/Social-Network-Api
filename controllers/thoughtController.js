@@ -69,7 +69,7 @@ const thoughtController = {
       res.status(500).json(err);
     }
   },
-  
+
 // Delete a thought by id
   async deleteThought(req, res) {
     try {
@@ -99,6 +99,47 @@ const thoughtController = {
       res.status(500).json(err);
     }
   },
+    // Create a reaction
+    async addReaction(req, res) {
+      try {
+        const dbThoughtData = await Thought.findOneAndUpdate(
+          { _id: req.params.id },
+          { $push: { reactions: req.body } },
+          { new: true }
+        );
+  
+        if (!dbThoughtData) {
+          res.status(404).json({ message: "No thought found with this id!" });
+          return;
+        }
+  
+        res.json(dbThoughtData);
+      } catch (err) {
+        console.log(err);
+        res.status(500).json(err);
+      }
+    },
+
+    // Delete a reaction
+    async removeReaction(req, res) {
+      try {
+        const dbThoughtData = await Thought.findOneAndUpdate(
+          { _id: req.params.id },
+          { $pull: { reactions: { reactionId: req.params.reactionId } } },
+          { runValidators: true, new: true }
+        );
+  
+        if (!dbThoughtData) {
+          res.status(404).json({ message: "No thought found with this id!" });
+          return;
+        }
+  
+        res.json({ message: "Reaction successfully deleted!" });
+      } catch (err) {
+        console.log(err);
+        res.status(500).json(err);
+      }
+    },
 };
 
 module.exports = thoughtController;
