@@ -16,7 +16,7 @@ const thoughtController = {
   // Get one thought by id
   async getThoughtById(req, res) {
     try {
-      const dbThoughtData = await Thought.findOne({ _id: req.params.id });
+      const dbThoughtData = await Thought.findOne({ _id: req.params.userId });
 
       if (!dbThoughtData) {
         res.status(404).json({ message: "No thought found with this id!" });
@@ -53,7 +53,7 @@ const thoughtController = {
   async updateThought(req, res) {
     try {
       const dbThoughtData = await Thought.findOneAndUpdate(
-        { _id: req.params.id },
+        { _id: req.params.userId },
         { $set: req.body },
         { new: true }
       );
@@ -74,7 +74,7 @@ const thoughtController = {
   async deleteThought(req, res) {
     try {
       const dbThoughtData = await Thought.findOneAndDelete({
-        _id: req.params.id,
+        _id: req.params.userId,
       });
 
       if (!dbThoughtData) {
@@ -103,7 +103,7 @@ const thoughtController = {
     async addReaction(req, res) {
       try {
         const dbThoughtData = await Thought.findOneAndUpdate(
-          { _id: req.params.id },
+          { _id: req.params.userId },
           { $push: { reactions: req.body } },
           { new: true }
         );
@@ -124,7 +124,7 @@ const thoughtController = {
     async removeReaction(req, res) {
       try {
         const dbThoughtData = await Thought.findOneAndUpdate(
-          { _id: req.params.id },
+          { _id: req.params.userId },
           { $pull: { reactions: { reactionId: req.params.reactionId } } },
           { runValidators: true, new: true }
         );
