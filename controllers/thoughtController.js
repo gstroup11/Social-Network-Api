@@ -33,22 +33,33 @@ const thoughtController = {
   // Create a thought
   async createThought(req, res) {
     try {
-      const dbThoughtData = await Thought.create(req.body);
-      const dbUserData = await User.findOneAndUpdate(
-        { _id: req.body.userId },
-        { $push: { thoughts: dbThoughtData._id } },
-        { new: true }
-      );
+      const { thoughtText, username } = req.body;
+  
+      // Check if the user with the provided username exists
+      const dbUserData = await User.findOne({ username });
+  
       if (!dbUserData) {
-        res.status(404).json({ message: "No user found with this id!" });
-        return;
+        return res.status(404).json({ message: "No user found with this username!" });
       }
-      res.json(dbUserData);
+  
+      // Create the thought and associate it with the user
+      const dbThoughtData = await Thought.create({
+        thoughtText,
+        username,
+      });
+  
+      // Update the user's thoughts array
+      dbUserData.thoughts.push(dbThoughtData._id);
+      await dbUserData.save();
+  
+      // Respond with the created thought data
+      res.json(dbThoughtData);
     } catch (err) {
-      console.log(err);
+      console.error(err);
       res.status(500).json(err);
     }
   },
+  
   // Update a thought by id
   async updateThought(req, res) {
     try {
